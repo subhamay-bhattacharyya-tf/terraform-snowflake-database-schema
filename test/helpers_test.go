@@ -178,9 +178,6 @@ func fetchSchemaProps(t *testing.T, db *sql.DB, databaseName, schemaName string)
 	cols, err := rows.Columns()
 	require.NoError(t, err)
 
-	// Log all column names for debugging
-	t.Logf("SHOW SCHEMAS columns: %v", cols)
-
 	nameIdx, dbIdx, commentIdx, retentionIdx, transientIdx, optionsIdx := -1, -1, -1, -1, -1, -1
 	for i, col := range cols {
 		switch col {
@@ -199,8 +196,6 @@ func fetchSchemaProps(t *testing.T, db *sql.DB, databaseName, schemaName string)
 		}
 	}
 	require.NotEqual(t, -1, nameIdx, "name column not found")
-	t.Logf("Column indices - name: %d, database_name: %d, comment: %d, retention_time: %d, is_transient: %d, options: %d", 
-		nameIdx, dbIdx, commentIdx, retentionIdx, transientIdx, optionsIdx)
 
 	require.True(t, rows.Next(), "No schema found matching %s in database %s", schemaName, databaseName)
 
@@ -212,14 +207,6 @@ func fetchSchemaProps(t *testing.T, db *sql.DB, databaseName, schemaName string)
 
 	err = rows.Scan(valuePtrs...)
 	require.NoError(t, err)
-
-	// Log the options value for debugging
-	if optionsIdx != -1 {
-		optionsValue := getString(values[optionsIdx])
-		t.Logf("Options column value: %q", optionsValue)
-	} else {
-		t.Log("Options column not found in SHOW SCHEMAS output")
-	}
 
 	props := SchemaProps{
 		Name: getString(values[nameIdx]),

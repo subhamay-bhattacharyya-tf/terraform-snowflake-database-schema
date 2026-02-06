@@ -48,10 +48,9 @@ func TestDatabaseWithMultipleSchemas(t *testing.T) {
 					"is_transient": true,
 				},
 				map[string]interface{}{
-					"name":                        curatedSchemaName,
-					"comment":                     "Curated business data",
-					"is_managed":                  true,
-					"data_retention_time_in_days": 14,
+					"name":       curatedSchemaName,
+					"comment":    "Curated business data",
+					"is_managed": true,
 				},
 			},
 		},
