@@ -1,0 +1,214 @@
+name: Terraform CI
+run-name: CI run by ${{ github.actor }} on ${{ github.ref_name }}
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'feature/**'
+      - 'bug/**'
+    paths:
+      - modules/**
+  pull_request:
+    branches: [main]
+    paths:
+      - modules/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # ============================================================================
+  # Terraform Validate
+  # ============================================================================
+  terraform-validate:
+    name: Terraform Validate
+    runs-on: ubuntu-latest
+    env:
+      TF_VERSION: ${{ vars.TERRAFORM_VERSION || '1.3.0' }}
+    strategy:
+      matrix:
+        module:
+          - modules/snowflake-warehouse
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+        working-directory: ${{ matrix.module }}
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+        working-directory: ${{ matrix.module }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ${{ matrix.module }}
+
+  # ============================================================================
+  # Validate Examples
+  # ============================================================================
+  examples-validate:
+    name: Validate Examples
+    runs-on: ubuntu-latest
+    needs: terraform-validate
+    env:
+      TF_VERSION: ${{ vars.TERRAFORM_VERSION || '1.3.0' }}
+    strategy:
+      matrix:
+        example:
+          - examples/basic
+          - examples/multiple-warehouses
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+        working-directory: ${{ matrix.example }}
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ${{ matrix.example }}
+
+  # ============================================================================
+  # Terratest Integration Tests
+  # ============================================================================
+  terratest:
+    name: Terratest
+    runs-on: ubuntu-latest
+    needs: examples-validate
+    env:
+      TF_VERSION: ${{ vars.TERRAFORM_VERSION || '1.3.0' }}
+      GO_VERSION: ${{ vars.GO_VERSION || '1.21' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+          terraform_wrapper: false
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: test/go.sum
+
+      - name: Download Go Dependencies
+        run: |
+          go mod tidy
+          go mod download
+        working-directory: test
+
+      - name: Run Terratest - Single Warehouse
+        id: single-warehouse-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestSingleWarehouse 2>&1 | tee single_warehouse_output.txt
+          echo "## Single Warehouse Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat single_warehouse_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: test
+        env:
+          SNOWFLAKE_ORGANIZATION_NAME: ${{ vars.SNOWFLAKE_ORGANIZATION_NAME }}
+          SNOWFLAKE_ACCOUNT_NAME: ${{ vars.SNOWFLAKE_ACCOUNT_NAME }}
+          SNOWFLAKE_USER: ${{ vars.SNOWFLAKE_USER }}
+          SNOWFLAKE_ROLE: ${{ vars.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+
+      - name: Run Terratest - Multiple Warehouses
+        id: multiple-warehouses-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestMultipleWarehouses 2>&1 | tee multiple_warehouses_output.txt
+          echo "## Multiple Warehouses Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat multiple_warehouses_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: test
+        env:
+          SNOWFLAKE_ORGANIZATION_NAME: ${{ vars.SNOWFLAKE_ORGANIZATION_NAME }}
+          SNOWFLAKE_ACCOUNT_NAME: ${{ vars.SNOWFLAKE_ACCOUNT_NAME }}
+          SNOWFLAKE_USER: ${{ vars.SNOWFLAKE_USER }}
+          SNOWFLAKE_ROLE: ${{ vars.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+
+  # ============================================================================
+  # Generate Change Log
+  # ============================================================================
+
+  generate-changelog:
+    name: Generate Changelog
+    runs-on: ubuntu-latest
+    needs: examples-validate
+    if: github.ref != 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate changelog
+        uses: orhun/git-cliff-action@v4
+        id: git-cliff
+        with:
+          config: cliff.toml
+          args: --verbose
+        env:
+          OUTPUT: CHANGELOG.md
+
+      - name: Commit changelog
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git diff --staged --quiet || git commit -m "docs: update CHANGELOG.md [skip ci]"
+          git push
+
+  # ============================================================================
+  # Semantic Release
+  # ============================================================================
+  semantic-release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    needs: [examples-validate, terratest]
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 'lts/*'
+
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

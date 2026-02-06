@@ -1,0 +1,22 @@
+name: Auto Create Branch
+run-name: Create Feature Branch by ${{ github.actor }} on ${{ github.ref_name }}
+
+on:
+  issues:
+    types: [assigned]
+
+permissions:
+  contents: write      # Required to create branches
+  issues: read         # Required to read issue details
+  
+jobs:
+  create-feature-branch:
+    name: "Create Feature Branch"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: subhamay-bhattacharyya-gha/create-branch-action@main
+        with:
+          title-length: 25
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          use-project-prefix: 'false'
+          branch-prefix: 'TFMOD'
