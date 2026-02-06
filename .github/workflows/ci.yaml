@@ -30,7 +30,7 @@ jobs:
     strategy:
       matrix:
         module:
-          - modules/snowflake-warehouse
+          - modules/database-schema
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -64,8 +64,10 @@ jobs:
     strategy:
       matrix:
         example:
-          - examples/basic
-          - examples/multiple-warehouses
+          - examples/database-only
+          - examples/database-with-one-schema
+          - examples/databases-with-multiple-schemas
+          - examples/multiple-databases-with-multiple-schemas
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -115,14 +117,14 @@ jobs:
           go mod download
         working-directory: test
 
-      - name: Run Terratest - Single Warehouse
-        id: single-warehouse-test
+      - name: Run Terratest - Single Database
+        id: single-database-test
         run: |
           set -o pipefail
-          go test -v -timeout 30m -run TestSingleWarehouse 2>&1 | tee single_warehouse_output.txt
-          echo "## Single Warehouse Test Results" >> $GITHUB_STEP_SUMMARY
+          go test -v -timeout 30m -run TestSingleDatabase 2>&1 | tee single_database_output.txt
+          echo "## Single Database Test Results" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          cat single_warehouse_output.txt >> $GITHUB_STEP_SUMMARY
+          cat single_database_output.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
         working-directory: test
         env:
@@ -132,14 +134,31 @@ jobs:
           SNOWFLAKE_ROLE: ${{ vars.SNOWFLAKE_ROLE }}
           SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
 
-      - name: Run Terratest - Multiple Warehouses
-        id: multiple-warehouses-test
+      - name: Run Terratest - Database with Schema
+        id: database-with-schema-test
         run: |
           set -o pipefail
-          go test -v -timeout 30m -run TestMultipleWarehouses 2>&1 | tee multiple_warehouses_output.txt
-          echo "## Multiple Warehouses Test Results" >> $GITHUB_STEP_SUMMARY
+          go test -v -timeout 30m -run TestDatabaseWithSchema 2>&1 | tee database_with_schema_output.txt
+          echo "## Database with Schema Test Results" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          cat multiple_warehouses_output.txt >> $GITHUB_STEP_SUMMARY
+          cat database_with_schema_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: test
+        env:
+          SNOWFLAKE_ORGANIZATION_NAME: ${{ vars.SNOWFLAKE_ORGANIZATION_NAME }}
+          SNOWFLAKE_ACCOUNT_NAME: ${{ vars.SNOWFLAKE_ACCOUNT_NAME }}
+          SNOWFLAKE_USER: ${{ vars.SNOWFLAKE_USER }}
+          SNOWFLAKE_ROLE: ${{ vars.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+
+      - name: Run Terratest - Multiple Databases
+        id: multiple-databases-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestMultipleDatabases 2>&1 | tee multiple_databases_output.txt
+          echo "## Multiple Databases Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat multiple_databases_output.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
         working-directory: test
         env:
