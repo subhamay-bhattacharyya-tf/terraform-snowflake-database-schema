@@ -41,7 +41,7 @@ variable "database_configs" {
   validation {
     condition = alltrue([
       for db in var.database_configs : alltrue([
-        for schema in db.schemas : schema.data_retention_time_in_days == null || schema.data_retention_time_in_days >= 0
+        for schema in db.schemas : coalesce(schema.data_retention_time_in_days, 0) >= 0
       ])
     ])
     error_message = "Schema data_retention_time_in_days must be >= 0 or null."
