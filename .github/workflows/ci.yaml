@@ -151,6 +151,23 @@ jobs:
           SNOWFLAKE_ROLE: ${{ vars.SNOWFLAKE_ROLE }}
           SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
 
+      - name: Run Terratest - Database with Multiple Schemas
+        id: database-with-multiple-schemas-test
+        run: |
+          set -o pipefail
+          go test -v -timeout 30m -run TestDatabaseWithMultipleSchemas 2>&1 | tee database_with_multiple_schemas_output.txt
+          echo "## Database with Multiple Schemas Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat database_with_multiple_schemas_output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        working-directory: test
+        env:
+          SNOWFLAKE_ORGANIZATION_NAME: ${{ vars.SNOWFLAKE_ORGANIZATION_NAME }}
+          SNOWFLAKE_ACCOUNT_NAME: ${{ vars.SNOWFLAKE_ACCOUNT_NAME }}
+          SNOWFLAKE_USER: ${{ vars.SNOWFLAKE_USER }}
+          SNOWFLAKE_ROLE: ${{ vars.SNOWFLAKE_ROLE }}
+          SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+
       - name: Run Terratest - Multiple Databases
         id: multiple-databases-test
         run: |

@@ -207,6 +207,7 @@ Required environment variables for testing:
 |-----------|----------------|---------------------|
 | `single_database_test.go` | database-only | Database creation, configuration fidelity |
 | `database_with_schema_test.go` | database-with-one-schema | Database/schema creation, managed access |
+| `database_with_multiple_schemas_test.go` | databases-with-multiple-schemas | Multiple schemas, transient schema, managed access |
 | `multiple_databases_test.go` | multiple-databases-with-multiple-schemas | Multiple databases, transient resources |
 
 ## CI/CD Configuration
