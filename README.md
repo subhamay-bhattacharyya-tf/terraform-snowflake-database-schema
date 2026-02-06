@@ -1,101 +1,130 @@
-# Terraform Snowflake Module - Warehouse
+# Terraform Snowflake Module - Database Schema
 
-![Release](https://github.com/subhamay-bhattacharyya-tf/terraform-snowflake-warehouse/actions/workflows/ci.yaml/badge.svg)&nbsp;![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8?logo=snowflake&logoColor=white)&nbsp;![Commit Activity](https://img.shields.io/github/commit-activity/t/subhamay-bhattacharyya-tf/terraform-snowflake-warehouse)&nbsp;![Last Commit](https://img.shields.io/github/last-commit/subhamay-bhattacharyya-tf/terraform-snowflake-warehouse)&nbsp;![Release Date](https://img.shields.io/github/release-date/subhamay-bhattacharyya-tf/terraform-snowflake-warehouse)&nbsp;![Repo Size](https://img.shields.io/github/repo-size/subhamay-bhattacharyya-tf/terraform-snowflake-warehouse)&nbsp;![File Count](https://img.shields.io/github/directory-file-count/subhamay-bhattacharyya-tf/terraform-snowflake-warehouse)&nbsp;![Issues](https://img.shields.io/github/issues/subhamay-bhattacharyya-tf/terraform-snowflake-warehouse)&nbsp;![Top Language](https://img.shields.io/github/languages/top/subhamay-bhattacharyya-tf/terraform-snowflake-warehouse)&nbsp;![Custom Endpoint](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/bsubhamay/73bb06aedb3721ff9a98cfe96f71647a/raw/terraform-snowflake-warehouse.json?)
+![Release](https://github.com/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema/actions/workflows/ci.yaml/badge.svg)&nbsp;![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8?logo=snowflake&logoColor=white)&nbsp;![Commit Activity](https://img.shields.io/github/commit-activity/t/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema)&nbsp;![Last Commit](https://img.shields.io/github/last-commit/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema)&nbsp;![Release Date](https://img.shields.io/github/release-date/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema)&nbsp;![Repo Size](https://img.shields.io/github/repo-size/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema)&nbsp;![File Count](https://img.shields.io/github/directory-file-count/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema)&nbsp;![Issues](https://img.shields.io/github/issues/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema)&nbsp;![Top Language](https://img.shields.io/github/languages/top/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema)&nbsp;![Custom Endpoint](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/bsubhamay/4770674f89a7a0961ce5f0bbce0cda1d/raw/terraform-snowflake-database-schema.json?)
 
-A Terraform module for creating and managing Snowflake warehouses using a map of configuration objects. Supports creating single or multiple warehouses with a single module call.
+A Terraform module for creating and managing Snowflake databases and schemas using a map of configuration objects. Supports creating single or multiple databases with nested schemas in a single module call.
 
 ## Features
 
-- Map-based configuration for creating single or multiple warehouses
+- Map-based configuration for creating single or multiple databases
+- Nested schema configuration within each database
 - Built-in input validation with descriptive error messages
 - Sensible defaults for optional properties
-- Outputs keyed by warehouse identifier for easy reference
-- Support for all Snowflake warehouse sizes and configurations
+- Outputs keyed by database identifier for easy reference
+- Support for transient databases and schemas
+- Support for managed access schemas
+- Configurable data retention time at database and schema level
 
 ## Usage
 
-### Single Warehouse
+### Single Database (No Schemas)
 
 ```hcl
-module "warehouse" {
-  source = "path/to/modules/snowflake-warehouse"
+module "database" {
+  source = "path/to/modules/database-schema"
 
-  warehouse_configs = {
-    "my_warehouse" = {
-      name                      = "MY_WAREHOUSE"
-      warehouse_size            = "X-SMALL"
-      warehouse_type            = "STANDARD"
-      auto_resume               = true
-      auto_suspend              = 60
-      initially_suspended       = true
-      min_cluster_count         = 1
-      max_cluster_count         = 1
-      scaling_policy            = "STANDARD"
-      enable_query_acceleration = false
-      comment                   = "My test warehouse"
+  database_configs = {
+    analytics = {
+      name                        = "ANALYTICS_DB"
+      comment                     = "Analytics database for reporting"
+      data_retention_time_in_days = 1
+      is_transient                = false
+      schemas                     = []
     }
   }
 }
 ```
 
-### Multiple Warehouses
+### Database with One Schema
 
 ```hcl
-locals {
-  warehouses = {
-    "adhoc_wh" = {
-      name                      = "SN_TEST_ADHOC_WH"
-      warehouse_size            = "X-SMALL"
-      warehouse_type            = "STANDARD"
-      auto_resume               = true
-      auto_suspend              = 60
-      initially_suspended       = true
-      min_cluster_count         = 1
-      max_cluster_count         = 1
-      scaling_policy            = "STANDARD"
-      enable_query_acceleration = false
-      comment                   = "Development and sandbox warehouse for ad-hoc queries"
-    }
-    "load_wh" = {
-      name                      = "SN_TEST_LOAD_WH"
-      warehouse_size            = "X-SMALL"
-      warehouse_type            = "STANDARD"
-      auto_resume               = true
-      auto_suspend              = 60
-      initially_suspended       = true
-      min_cluster_count         = 1
-      max_cluster_count         = 1
-      scaling_policy            = "STANDARD"
-      enable_query_acceleration = false
-      comment                   = "Dedicated ingestion warehouse for loading files"
-    }
-    "transform_wh" = {
-      name                      = "SN_TEST_TRANSFORM_WH"
-      warehouse_size            = "MEDIUM"
-      warehouse_type            = "STANDARD"
-      auto_resume               = true
-      auto_suspend              = 300
-      initially_suspended       = true
-      min_cluster_count         = 1
-      max_cluster_count         = 3
-      scaling_policy            = "STANDARD"
-      enable_query_acceleration = true
-      comment                   = "ETL/ELT warehouse for transformations"
+module "database" {
+  source = "path/to/modules/database-schema"
+
+  database_configs = {
+    app = {
+      name    = "APPLICATION_DB"
+      comment = "Main application database"
+      schemas = [
+        {
+          name       = "PUBLIC_DATA"
+          comment    = "Public facing data schema"
+          is_managed = true
+        }
+      ]
     }
   }
 }
+```
 
-module "warehouses" {
-  source = "path/to/modules/snowflake-warehouse"
+### Database with Multiple Schemas
 
-  warehouse_configs = local.warehouses
+```hcl
+module "database" {
+  source = "path/to/modules/database-schema"
+
+  database_configs = {
+    datawarehouse = {
+      name                        = "DATA_WAREHOUSE"
+      comment                     = "Central data warehouse"
+      data_retention_time_in_days = 7
+      schemas = [
+        {
+          name       = "RAW"
+          comment    = "Raw ingested data"
+          is_managed = false
+        },
+        {
+          name         = "STAGING"
+          comment      = "Data transformation staging area"
+          is_transient = true
+        },
+        {
+          name                        = "CURATED"
+          comment                     = "Curated business data"
+          is_managed                  = true
+          data_retention_time_in_days = 14
+        }
+      ]
+    }
+  }
+}
+```
+
+### Multiple Databases with Multiple Schemas
+
+```hcl
+module "database" {
+  source = "path/to/modules/database-schema"
+
+  database_configs = {
+    production = {
+      name    = "PROD_DB"
+      comment = "Production database"
+      schemas = [
+        { name = "APP", comment = "Application schema" },
+        { name = "AUDIT", comment = "Audit logging schema", is_managed = true }
+      ]
+    },
+    development = {
+      name         = "DEV_DB"
+      comment      = "Development database"
+      is_transient = true
+      schemas = [
+        { name = "SANDBOX", comment = "Developer sandbox" },
+        { name = "TESTING", comment = "Test data schema", is_transient = true }
+      ]
+    }
+  }
 }
 ```
 
 ## Examples
 
-- [Basic (Single Warehouse)](examples/basic) - Create a single warehouse
-- [Multiple Warehouses](examples/multiple-warehouses) - Create multiple warehouses
+- [Database Only](examples/database-only) - Create a single database without schemas
+- [Database with One Schema](examples/database-with-one-schema) - Create a database with a single schema
+- [Database with Multiple Schemas](examples/databases-with-multiple-schemas) - Create a database with multiple schemas
+- [Multiple Databases with Multiple Schemas](examples/multiple-databases-with-multiple-schemas) - Create multiple databases with multiple schemas
 
 ## Requirements
 
@@ -114,67 +143,46 @@ module "warehouses" {
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|----------|
-| warehouse_configs | Map of configuration objects for Snowflake warehouses | `map(object)` | `{}` | no |
+| database_configs | Map of configuration objects for Snowflake databases and their schemas | `map(object)` | `{}` | no |
 
-### warehouse_configs Object Properties
+### database_configs Object Properties
 
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
-| name | string | - | Warehouse identifier (required) |
-| warehouse_size | string | "X-SMALL" | Size of the warehouse |
-| warehouse_type | string | "STANDARD" | Type of warehouse (STANDARD, SNOWPARK-OPTIMIZED) |
-| auto_resume | bool | true | Auto-resume when queries are submitted |
-| auto_suspend | number | 60 | Seconds of inactivity before auto-suspend |
-| initially_suspended | bool | true | Start in suspended state |
-| min_cluster_count | number | 1 | Minimum number of clusters |
-| max_cluster_count | number | 1 | Maximum number of clusters |
-| scaling_policy | string | "STANDARD" | Scaling policy (STANDARD, ECONOMY) |
-| enable_query_acceleration | bool | false | Enable query acceleration |
-| comment | string | null | Description of the warehouse |
+| name | string | - | Database name (required) |
+| comment | string | null | Description of the database |
+| data_retention_time_in_days | number | 1 | Time Travel data retention period in days |
+| is_transient | bool | false | Whether the database is transient |
+| schemas | list(object) | [] | List of schema configurations |
 
-### Valid Warehouse Sizes
+### schemas Object Properties
 
-- X-SMALL (XSMALL)
-- SMALL
-- MEDIUM
-- LARGE
-- X-LARGE (XLARGE)
-- 2X-LARGE (XXLARGE, X2LARGE)
-- 3X-LARGE (XXXLARGE, X3LARGE)
-- 4X-LARGE (X4LARGE)
-- 5X-LARGE (X5LARGE)
-- 6X-LARGE (X6LARGE)
-
-### Valid Warehouse Types
-
-- STANDARD
-- SNOWPARK-OPTIMIZED
-
-### Valid Scaling Policies
-
-- STANDARD
-- ECONOMY
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| name | string | - | Schema name (required) |
+| comment | string | null | Description of the schema |
+| is_transient | bool | false | Whether the schema is transient |
+| is_managed | bool | false | Whether the schema has managed access |
+| data_retention_time_in_days | number | null | Time Travel data retention (inherits from database if null) |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| warehouse_names | Map of warehouse names keyed by identifier |
-| warehouse_fully_qualified_names | Map of fully qualified warehouse names |
-| warehouse_sizes | Map of warehouse sizes |
-| warehouse_states | Map of warehouse states (STARTED or SUSPENDED) |
-| warehouses | All warehouse resources |
+| database_names | Map of database config keys to database names |
+| database_fully_qualified_names | Map of database config keys to fully qualified names |
+| databases | All database resource objects |
+| schema_names | Nested map of database keys to schema names |
+| schema_fully_qualified_names | Nested map of database keys to schema fully qualified names |
+| schemas | All schema resource objects |
 
 ## Validation
 
 The module validates inputs and provides descriptive error messages for:
 
-- Empty warehouse name
-- Invalid warehouse size
-- Invalid warehouse type
-- Invalid scaling policy
-- Negative auto_suspend value
-- min_cluster_count exceeding max_cluster_count
+- Empty database name
+- Empty schema name
+- Negative data_retention_time_in_days value
 
 ## Testing
 
@@ -192,6 +200,15 @@ Required environment variables for testing:
 - `SNOWFLAKE_USER` - Snowflake username
 - `SNOWFLAKE_ROLE` - Snowflake role (e.g., "SYSADMIN")
 - `SNOWFLAKE_PRIVATE_KEY` - Snowflake private key for key-pair authentication
+
+### Test Coverage
+
+| Test File | Example Tested | Properties Validated |
+|-----------|----------------|---------------------|
+| `single_database_test.go` | database-only | Database creation, configuration fidelity |
+| `database_with_schema_test.go` | database-with-one-schema | Database/schema creation, managed access |
+| `database_with_multiple_schemas_test.go` | databases-with-multiple-schemas | Multiple schemas, transient schema, managed access |
+| `multiple_databases_test.go` | multiple-databases-with-multiple-schemas | Multiple databases, transient resources |
 
 ## CI/CD Configuration
 
