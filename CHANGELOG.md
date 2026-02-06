@@ -15,10 +15,12 @@
 - Update CHANGELOG.md [skip ci]
 - Update CHANGELOG.md [skip ci]
 - Update CHANGELOG.md [skip ci]
+- Update CHANGELOG.md [skip ci]
 
 ### 🧪 Testing
 
 - *(helpers)* Update schema column mapping and add debugging logs
+- *(database-schema)* Remove debug logging and clean up test assertions
 
 ### ⚙️ Miscellaneous Tasks
 
