@@ -1,3 +1,11 @@
+# -----------------------------------------------------------------------------
+# Terraform Snowflake Database Schema Module
+# -----------------------------------------------------------------------------
+# This module creates Snowflake databases and schemas using a map-based
+# configuration. It supports creating single or multiple databases with
+# nested schemas in a single module call.
+# -----------------------------------------------------------------------------
+
 locals {
   schemas = merge([
     for db_key, db in var.database_configs : {

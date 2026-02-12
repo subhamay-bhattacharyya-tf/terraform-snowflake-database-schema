@@ -1,3 +1,9 @@
+# -----------------------------------------------------------------------------
+# Terraform Snowflake Database Schema Module - Version Constraints
+# -----------------------------------------------------------------------------
+# Required Terraform and provider versions.
+# -----------------------------------------------------------------------------
+
 terraform {
   required_version = ">= 1.3.0"
 

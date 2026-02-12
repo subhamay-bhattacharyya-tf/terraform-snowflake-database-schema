@@ -1,3 +1,9 @@
+# -----------------------------------------------------------------------------
+# Terraform Snowflake Database Schema Module - Variables
+# -----------------------------------------------------------------------------
+# Input variables for configuring Snowflake databases and schemas.
+# -----------------------------------------------------------------------------
+
 variable "database_configs" {
   description = "Map of configuration objects for Snowflake databases and their schemas"
   type = map(object({
