@@ -1,8 +1,16 @@
 ## [unreleased]
 
+### 🚀 Features
+
+- Refactor repository to single-module layout
+
 ### 🚜 Refactor
 
 - Restructure module to root level and update CI/CD paths
+
+### 📚 Documentation
+
+- Update CHANGELOG.md [skip ci]
 ## [1.0.0] - 2026-02-06
 
 ### 🚀 Features
