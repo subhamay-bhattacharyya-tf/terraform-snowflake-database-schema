@@ -1,3 +1,9 @@
+# -----------------------------------------------------------------------------
+# Terraform Snowflake Database Schema Module - Outputs
+# -----------------------------------------------------------------------------
+# Output values for created Snowflake databases and schemas.
+# -----------------------------------------------------------------------------
+
 output "database_names" {
   description = "Map of database config keys to database names."
   value       = { for k, v in snowflake_database.this : k => v.name }
