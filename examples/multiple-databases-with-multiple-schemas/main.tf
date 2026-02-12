@@ -6,7 +6,7 @@
 # transient databases and schemas, managed access, and data retention.
 
 module "database" {
-  source = "../../modules/database-schema"
+  source = "../.."
 
   database_configs = var.database_configs
 }

@@ -6,7 +6,7 @@
 # managed access, and custom data retention settings.
 
 module "database" {
-  source = "../../modules/database-schema"
+  source = "../.."
 
   database_configs = var.database_configs
 }

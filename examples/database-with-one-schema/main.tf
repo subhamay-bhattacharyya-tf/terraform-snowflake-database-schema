@@ -5,7 +5,7 @@
 # The schema includes optional properties like comment and managed access.
 
 module "database" {
-  source = "../../modules/database-schema"
+  source = "../.."
 
   database_configs = var.database_configs
 }

@@ -21,7 +21,7 @@ A Terraform module for creating and managing Snowflake databases and schemas usi
 
 ```hcl
 module "database" {
-  source = "path/to/modules/database-schema"
+  source = "github.com/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema"
 
   database_configs = {
     analytics = {
@@ -39,7 +39,7 @@ module "database" {
 
 ```hcl
 module "database" {
-  source = "path/to/modules/database-schema"
+  source = "github.com/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema"
 
   database_configs = {
     app = {
@@ -61,7 +61,7 @@ module "database" {
 
 ```hcl
 module "database" {
-  source = "path/to/modules/database-schema"
+  source = "github.com/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema"
 
   database_configs = {
     datawarehouse = {
@@ -95,7 +95,7 @@ module "database" {
 
 ```hcl
 module "database" {
-  source = "path/to/modules/database-schema"
+  source = "github.com/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema"
 
   database_configs = {
     production = {
@@ -213,8 +213,8 @@ Required environment variables for testing:
 ## CI/CD Configuration
 
 The CI workflow runs on:
-- Push to `main`, `feature/**`, and `bug/**` branches (when `modules/**` changes)
-- Pull requests to `main` (when `modules/**` changes)
+- Push to `main`, `feature/**`, and `bug/**` branches (when `*.tf`, `examples/**`, or `test/**` changes)
+- Pull requests to `main` (when `*.tf`, `examples/**`, or `test/**` changes)
 - Manual workflow dispatch
 
 The workflow includes:

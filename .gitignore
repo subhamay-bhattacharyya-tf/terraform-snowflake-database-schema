@@ -49,3 +49,6 @@ node_modules/
 
 ## Ignore log files
 gh-log.txt
+
+### Ignore the terraform lock file
+.terraform.lock.hcl

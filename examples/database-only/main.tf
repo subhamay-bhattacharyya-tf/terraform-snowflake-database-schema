@@ -5,7 +5,7 @@
 # This is the minimal configuration needed to create a database.
 
 module "database" {
-  source = "../../modules/database-schema"
+  source = "../.."
 
   database_configs = var.database_configs
 }
