@@ -1,14 +1,13 @@
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-## [1.1.0](https://github.com/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema/compare/v1.0.0...v1.1.0) (2026-02-12)
-
-### Features
-
-* refactor repository to single-module layout ([7efb2ae](https://github.com/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema/commit/7efb2ae1d1390c27072295e87a428c1d4a0dc840))
-
 ## [unreleased]
+
+### 🚀 Features
+
+- Add database and schema grants support
+
+### 🎨 Styling
+
+- *(variables)* Fix indentation in database_configs variable
+## [1.1.0] - 2026-02-12
 
 ### 🚀 Features
 
@@ -21,6 +20,11 @@ All notable changes to this project will be documented in this file.
 ### 📚 Documentation
 
 - Update CHANGELOG.md [skip ci]
+- Update CHANGELOG.md [skip ci]
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Version 1.1.0 [skip ci]
 ## [1.0.0] - 2026-02-06
 
 ### 🚀 Features
