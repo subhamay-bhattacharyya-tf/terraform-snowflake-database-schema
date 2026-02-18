@@ -3,6 +3,11 @@
 ### 🚀 Features
 
 - Add database and schema grants support
+- *(outputs)* Add debug outputs for database and schema usage grants
+
+### 📚 Documentation
+
+- Update CHANGELOG.md [skip ci]
 
 ### 🎨 Styling
 
