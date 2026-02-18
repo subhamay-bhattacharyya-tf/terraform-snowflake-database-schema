@@ -14,6 +14,8 @@ A Terraform module for creating and managing Snowflake databases and schemas usi
 - Support for transient databases and schemas
 - Support for managed access schemas
 - Configurable data retention time at database and schema level
+- Database-level grants (USAGE)
+- Schema-level grants (USAGE, CREATE FILE FORMAT, CREATE STAGE, CREATE TABLE, CREATE PIPE)
 
 ## Usage
 
@@ -45,11 +47,19 @@ module "database" {
     app = {
       name    = "APPLICATION_DB"
       comment = "Main application database"
+      grants = {
+        usage_roles = ["DATA_READER_ROLE"]
+      }
       schemas = [
         {
           name       = "PUBLIC_DATA"
           comment    = "Public facing data schema"
           is_managed = true
+          grants = {
+            usage_roles              = ["DATA_READER_ROLE"]
+            create_table_roles       = ["DATA_WRITER_ROLE"]
+            create_file_format_roles = ["ETL_ROLE"]
+          }
         }
       ]
     }
@@ -153,7 +163,14 @@ module "database" {
 | comment | string | null | Description of the database |
 | data_retention_time_in_days | number | 1 | Time Travel data retention period in days |
 | is_transient | bool | false | Whether the database is transient |
+| grants | object | {} | Database-level grants configuration |
 | schemas | list(object) | [] | List of schema configurations |
+
+### grants Object Properties (Database Level)
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| usage_roles | list(string) | [] | Roles to grant USAGE privilege on the database |
 
 ### schemas Object Properties
 
@@ -164,6 +181,17 @@ module "database" {
 | is_transient | bool | false | Whether the schema is transient |
 | is_managed | bool | false | Whether the schema has managed access |
 | data_retention_time_in_days | number | null | Time Travel data retention (inherits from database if null) |
+| grants | object | {} | Schema-level grants configuration |
+
+### grants Object Properties (Schema Level)
+
+| Property | Type | Default | Description |
+|----------|------|---------|-------------|
+| usage_roles | list(string) | [] | Roles to grant USAGE privilege on the schema |
+| create_file_format_roles | list(string) | [] | Roles to grant CREATE FILE FORMAT privilege |
+| create_stage_roles | list(string) | [] | Roles to grant CREATE STAGE privilege |
+| create_table_roles | list(string) | [] | Roles to grant CREATE TABLE privilege |
+| create_pipe_roles | list(string) | [] | Roles to grant CREATE PIPE privilege |
 
 ## Outputs
 
@@ -205,10 +233,10 @@ Required environment variables for testing:
 
 | Test File | Example Tested | Properties Validated |
 |-----------|----------------|---------------------|
-| `single_database_test.go` | database-only | Database creation, configuration fidelity |
-| `database_with_schema_test.go` | database-with-one-schema | Database/schema creation, managed access |
-| `database_with_multiple_schemas_test.go` | databases-with-multiple-schemas | Multiple schemas, transient schema, managed access |
-| `multiple_databases_test.go` | multiple-databases-with-multiple-schemas | Multiple databases, transient resources |
+| `database_only_test.go` | database-only | Database creation, configuration fidelity |
+| `database_with_one_schema_test.go` | database-with-one-schema | Database/schema creation, managed access |
+| `databases_with_multiple_schemas_test.go` | databases-with-multiple-schemas | Multiple schemas, transient schema, managed access |
+| `multiple_databases_with_multiple_schemas_test.go` | multiple-databases-with-multiple-schemas | Multiple databases, transient resources |
 
 ## CI/CD Configuration
 

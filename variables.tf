@@ -11,12 +11,28 @@ variable "database_configs" {
     comment                     = optional(string, null)
     data_retention_time_in_days = optional(number, 1)
     is_transient                = optional(bool, false)
+    grants = optional(object({
+      usage_roles = optional(list(string), [])
+    }), { usage_roles = [] })
     schemas = optional(list(object({
       name                        = string
       comment                     = optional(string, null)
       is_transient                = optional(bool, false)
       is_managed                  = optional(bool, false)
       data_retention_time_in_days = optional(number, null)
+      grants = optional(object({
+        usage_roles              = optional(list(string), [])
+        create_file_format_roles = optional(list(string), [])
+        create_stage_roles       = optional(list(string), [])
+        create_table_roles       = optional(list(string), [])
+        create_pipe_roles        = optional(list(string), [])
+        }), {
+        usage_roles              = []
+        create_file_format_roles = []
+        create_stage_roles       = []
+        create_table_roles       = []
+        create_pipe_roles        = []
+      })
     })), [])
   }))
   default = {}
