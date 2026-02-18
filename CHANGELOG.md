@@ -8,10 +8,15 @@
 ### 📚 Documentation
 
 - Update CHANGELOG.md [skip ci]
+- Update CHANGELOG.md [skip ci]
 
 ### 🎨 Styling
 
 - *(variables)* Fix indentation in database_configs variable
+
+### ⚙️ Miscellaneous Tasks
+
+- *(outputs)* Remove debug outputs for database and schema usage grants
 ## [1.1.0] - 2026-02-12
 
 ### 🚀 Features
