@@ -26,7 +26,7 @@ variable "database_configs" {
         create_stage_roles       = optional(list(string), [])
         create_table_roles       = optional(list(string), [])
         create_pipe_roles        = optional(list(string), [])
-      }), {
+        }), {
         usage_roles              = []
         create_file_format_roles = []
         create_stage_roles       = []
