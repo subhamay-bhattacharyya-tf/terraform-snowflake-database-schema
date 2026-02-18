@@ -181,12 +181,3 @@ resource "snowflake_grant_privileges_to_account_role" "schema_create_pipe" {
     schema_name = snowflake_schema.this[each.value.schema_key].fully_qualified_name
   }
 }
-
-
-output "debug_database_usage_grants" {
-  value = local.database_usage_grants
-}
-
-output "debug_schema_usage_grants" {
-  value = local.schema_usage_grants
-}
