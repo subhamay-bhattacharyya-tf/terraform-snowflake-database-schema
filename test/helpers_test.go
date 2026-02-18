@@ -265,3 +265,142 @@ func getInt(v interface{}) int {
 	}
 	return 0
 }
+
+// GrantInfo represents a grant privilege record
+type GrantInfo struct {
+	Privilege string
+	GrantedOn string
+	Name      string
+	GrantedTo string
+	Grantee   string
+}
+
+// fetchDatabaseGrants retrieves grants on a database for a specific role
+func fetchDatabaseGrants(t *testing.T, db *sql.DB, databaseName, roleName string) []GrantInfo {
+	t.Helper()
+
+	q := fmt.Sprintf("SHOW GRANTS ON DATABASE %s;", databaseName)
+	rows, err := db.Query(q)
+	require.NoError(t, err)
+	defer func() { _ = rows.Close() }()
+
+	cols, err := rows.Columns()
+	require.NoError(t, err)
+
+	privIdx, grantedOnIdx, nameIdx, grantedToIdx, granteeIdx := -1, -1, -1, -1, -1
+	for i, col := range cols {
+		switch col {
+		case "privilege":
+			privIdx = i
+		case "granted_on":
+			grantedOnIdx = i
+		case "name":
+			nameIdx = i
+		case "granted_to":
+			grantedToIdx = i
+		case "grantee_name":
+			granteeIdx = i
+		}
+	}
+
+	var grants []GrantInfo
+	for rows.Next() {
+		values := make([]interface{}, len(cols))
+		valuePtrs := make([]interface{}, len(cols))
+		for i := range values {
+			valuePtrs[i] = &values[i]
+		}
+
+		err = rows.Scan(valuePtrs...)
+		require.NoError(t, err)
+
+		grantee := ""
+		if granteeIdx != -1 {
+			grantee = getString(values[granteeIdx])
+		}
+
+		// Filter by role name
+		if strings.EqualFold(grantee, roleName) {
+			grant := GrantInfo{
+				Privilege: getString(values[privIdx]),
+				GrantedOn: getString(values[grantedOnIdx]),
+				Name:      getString(values[nameIdx]),
+				GrantedTo: getString(values[grantedToIdx]),
+				Grantee:   grantee,
+			}
+			grants = append(grants, grant)
+		}
+	}
+
+	return grants
+}
+
+// fetchSchemaGrants retrieves grants on a schema for a specific role
+func fetchSchemaGrants(t *testing.T, db *sql.DB, databaseName, schemaName, roleName string) []GrantInfo {
+	t.Helper()
+
+	q := fmt.Sprintf("SHOW GRANTS ON SCHEMA %s.%s;", databaseName, schemaName)
+	rows, err := db.Query(q)
+	require.NoError(t, err)
+	defer func() { _ = rows.Close() }()
+
+	cols, err := rows.Columns()
+	require.NoError(t, err)
+
+	privIdx, grantedOnIdx, nameIdx, grantedToIdx, granteeIdx := -1, -1, -1, -1, -1
+	for i, col := range cols {
+		switch col {
+		case "privilege":
+			privIdx = i
+		case "granted_on":
+			grantedOnIdx = i
+		case "name":
+			nameIdx = i
+		case "granted_to":
+			grantedToIdx = i
+		case "grantee_name":
+			granteeIdx = i
+		}
+	}
+
+	var grants []GrantInfo
+	for rows.Next() {
+		values := make([]interface{}, len(cols))
+		valuePtrs := make([]interface{}, len(cols))
+		for i := range values {
+			valuePtrs[i] = &values[i]
+		}
+
+		err = rows.Scan(valuePtrs...)
+		require.NoError(t, err)
+
+		grantee := ""
+		if granteeIdx != -1 {
+			grantee = getString(values[granteeIdx])
+		}
+
+		// Filter by role name
+		if strings.EqualFold(grantee, roleName) {
+			grant := GrantInfo{
+				Privilege: getString(values[privIdx]),
+				GrantedOn: getString(values[grantedOnIdx]),
+				Name:      getString(values[nameIdx]),
+				GrantedTo: getString(values[grantedToIdx]),
+				Grantee:   grantee,
+			}
+			grants = append(grants, grant)
+		}
+	}
+
+	return grants
+}
+
+// hasPrivilege checks if a list of grants contains a specific privilege
+func hasPrivilege(grants []GrantInfo, privilege string) bool {
+	for _, g := range grants {
+		if strings.EqualFold(g.Privilege, privilege) {
+			return true
+		}
+	}
+	return false
+}
