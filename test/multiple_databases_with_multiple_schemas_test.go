@@ -1,4 +1,4 @@
-// File: test/multiple_databases_test.go
+// File: test/multiple_databases_with_multiple_schemas_test.go
 package test
 
 import (
@@ -37,15 +37,18 @@ func TestMultipleDatabases(t *testing.T) {
 		"production": map[string]interface{}{
 			"name":    prodDbName,
 			"comment": "Terratest production database",
+			"grants":  map[string]interface{}{},
 			"schemas": []interface{}{
 				map[string]interface{}{
 					"name":    appSchemaName,
 					"comment": "Application schema",
+					"grants":  map[string]interface{}{},
 				},
 				map[string]interface{}{
 					"name":       auditSchemaName,
 					"comment":    "Audit logging schema",
 					"is_managed": true,
+					"grants":     map[string]interface{}{},
 				},
 			},
 		},
@@ -53,15 +56,18 @@ func TestMultipleDatabases(t *testing.T) {
 			"name":         devDbName,
 			"comment":      "Terratest development database",
 			"is_transient": true,
+			"grants":       map[string]interface{}{},
 			"schemas": []interface{}{
 				map[string]interface{}{
 					"name":    sandboxSchemaName,
 					"comment": "Developer sandbox",
+					"grants":  map[string]interface{}{},
 				},
 				map[string]interface{}{
 					"name":         testingSchemaName,
 					"comment":      "Test data schema",
 					"is_transient": true,
+					"grants":       map[string]interface{}{},
 				},
 			},
 		},

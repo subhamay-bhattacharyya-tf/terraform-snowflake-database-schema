@@ -6,7 +6,7 @@ This example demonstrates how to create a single Snowflake database without any 
 
 ```hcl
 module "database" {
-  source = "../../modules/database-schema"
+  source = "../.."
 
   database_configs = {
     analytics = {
@@ -14,7 +14,10 @@ module "database" {
       comment                     = "Analytics database for reporting"
       data_retention_time_in_days = 1
       is_transient                = false
-      schemas                     = []
+      grants = {
+        usage_roles = ["DATA_READER_ROLE"]
+      }
+      schemas = []
     }
   }
 }

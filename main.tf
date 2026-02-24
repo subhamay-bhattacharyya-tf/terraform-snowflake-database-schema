@@ -79,6 +79,56 @@ locals {
       }
     }
   ]...)
+
+  schema_create_dynamic_table_grants = merge([
+    for schema_key, schema_data in local.schemas : {
+      for role in schema_data.schema.grants.create_dynamic_table_roles :
+      "${schema_key}_${role}" => {
+        schema_key = schema_key
+        role       = role
+      }
+    }
+  ]...)
+
+  schema_create_stream_grants = merge([
+    for schema_key, schema_data in local.schemas : {
+      for role in schema_data.schema.grants.create_stream_roles :
+      "${schema_key}_${role}" => {
+        schema_key = schema_key
+        role       = role
+      }
+    }
+  ]...)
+
+  schema_create_task_grants = merge([
+    for schema_key, schema_data in local.schemas : {
+      for role in schema_data.schema.grants.create_task_roles :
+      "${schema_key}_${role}" => {
+        schema_key = schema_key
+        role       = role
+      }
+    }
+  ]...)
+
+  schema_create_view_grants = merge([
+    for schema_key, schema_data in local.schemas : {
+      for role in schema_data.schema.grants.create_view_roles :
+      "${schema_key}_${role}" => {
+        schema_key = schema_key
+        role       = role
+      }
+    }
+  ]...)
+
+  schema_create_materialized_view_grants = merge([
+    for schema_key, schema_data in local.schemas : {
+      for role in schema_data.schema.grants.create_materialized_view_roles :
+      "${schema_key}_${role}" => {
+        schema_key = schema_key
+        role       = role
+      }
+    }
+  ]...)
 }
 
 resource "snowflake_database" "this" {
@@ -175,6 +225,66 @@ resource "snowflake_grant_privileges_to_account_role" "schema_create_pipe" {
   for_each = local.schema_create_pipe_grants
 
   privileges        = ["CREATE PIPE"]
+  account_role_name = each.value.role
+
+  on_schema {
+    schema_name = snowflake_schema.this[each.value.schema_key].fully_qualified_name
+  }
+}
+
+# Schema CREATE DYNAMIC TABLE grants
+resource "snowflake_grant_privileges_to_account_role" "schema_create_dynamic_table" {
+  for_each = local.schema_create_dynamic_table_grants
+
+  privileges        = ["CREATE DYNAMIC TABLE"]
+  account_role_name = each.value.role
+
+  on_schema {
+    schema_name = snowflake_schema.this[each.value.schema_key].fully_qualified_name
+  }
+}
+
+# Schema CREATE STREAM grants
+resource "snowflake_grant_privileges_to_account_role" "schema_create_stream" {
+  for_each = local.schema_create_stream_grants
+
+  privileges        = ["CREATE STREAM"]
+  account_role_name = each.value.role
+
+  on_schema {
+    schema_name = snowflake_schema.this[each.value.schema_key].fully_qualified_name
+  }
+}
+
+# Schema CREATE TASK grants
+resource "snowflake_grant_privileges_to_account_role" "schema_create_task" {
+  for_each = local.schema_create_task_grants
+
+  privileges        = ["CREATE TASK"]
+  account_role_name = each.value.role
+
+  on_schema {
+    schema_name = snowflake_schema.this[each.value.schema_key].fully_qualified_name
+  }
+}
+
+# Schema CREATE VIEW grants
+resource "snowflake_grant_privileges_to_account_role" "schema_create_view" {
+  for_each = local.schema_create_view_grants
+
+  privileges        = ["CREATE VIEW"]
+  account_role_name = each.value.role
+
+  on_schema {
+    schema_name = snowflake_schema.this[each.value.schema_key].fully_qualified_name
+  }
+}
+
+# Schema CREATE MATERIALIZED VIEW grants
+resource "snowflake_grant_privileges_to_account_role" "schema_create_materialized_view" {
+  for_each = local.schema_create_materialized_view_grants
+
+  privileges        = ["CREATE MATERIALIZED VIEW"]
   account_role_name = each.value.role
 
   on_schema {

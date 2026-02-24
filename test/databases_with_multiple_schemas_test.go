@@ -1,4 +1,4 @@
-// File: test/database_with_multiple_schemas_test.go
+// File: test/databases_with_multiple_schemas_test.go
 package test
 
 import (
@@ -36,21 +36,25 @@ func TestDatabaseWithMultipleSchemas(t *testing.T) {
 			"name":                        dbName,
 			"comment":                     "Terratest data warehouse",
 			"data_retention_time_in_days": 7,
+			"grants":                      map[string]interface{}{},
 			"schemas": []interface{}{
 				map[string]interface{}{
 					"name":       rawSchemaName,
 					"comment":    "Raw ingested data",
 					"is_managed": false,
+					"grants":     map[string]interface{}{},
 				},
 				map[string]interface{}{
 					"name":         stagingSchemaName,
 					"comment":      "Data transformation staging area",
 					"is_transient": true,
+					"grants":       map[string]interface{}{},
 				},
 				map[string]interface{}{
 					"name":       curatedSchemaName,
 					"comment":    "Curated business data",
 					"is_managed": true,
+					"grants":     map[string]interface{}{},
 				},
 			},
 		},
