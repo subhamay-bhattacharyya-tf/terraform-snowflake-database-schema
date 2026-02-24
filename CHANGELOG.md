@@ -1,3 +1,13 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [1.3.0](https://github.com/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema/compare/v1.2.0...v1.3.0) (2026-02-24)
+
+### Features
+
+* add CREATE VIEW and CREATE MATERIALIZED VIEW schema grants ([9a67aa5](https://github.com/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema/commit/9a67aa5b59d0f5f45689923ed70527375dbcdcff))
+
 ## [unreleased]
 
 ### 🚀 Features
