@@ -15,7 +15,7 @@ A Terraform module for creating and managing Snowflake databases and schemas usi
 - Support for managed access schemas
 - Configurable data retention time at database and schema level
 - Database-level grants (USAGE)
-- Schema-level grants (USAGE, CREATE FILE FORMAT, CREATE STAGE, CREATE TABLE, CREATE PIPE)
+- Schema-level grants (USAGE, CREATE FILE FORMAT, CREATE STAGE, CREATE TABLE, CREATE PIPE, CREATE DYNAMIC TABLE, CREATE STREAM, CREATE TASK, CREATE VIEW, CREATE MATERIALIZED VIEW)
 
 ## Usage
 
@@ -192,6 +192,11 @@ module "database" {
 | create_stage_roles | list(string) | [] | Roles to grant CREATE STAGE privilege |
 | create_table_roles | list(string) | [] | Roles to grant CREATE TABLE privilege |
 | create_pipe_roles | list(string) | [] | Roles to grant CREATE PIPE privilege |
+| create_dynamic_table_roles | list(string) | [] | Roles to grant CREATE DYNAMIC TABLE privilege |
+| create_stream_roles | list(string) | [] | Roles to grant CREATE STREAM privilege |
+| create_task_roles | list(string) | [] | Roles to grant CREATE TASK privilege |
+| create_view_roles | list(string) | [] | Roles to grant CREATE VIEW privilege |
+| create_materialized_view_roles | list(string) | [] | Roles to grant CREATE MATERIALIZED VIEW privilege |
 
 ## Outputs
 

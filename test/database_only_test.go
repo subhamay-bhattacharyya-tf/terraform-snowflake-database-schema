@@ -1,4 +1,4 @@
-// File: test/single_database_test.go
+// File: test/database_only_test.go
 package test
 
 import (
@@ -31,6 +31,7 @@ func TestSingleDatabase(t *testing.T) {
 			"comment":                     "Terratest single database test",
 			"data_retention_time_in_days": 1,
 			"is_transient":                false,
+			"grants":                      map[string]interface{}{},
 			"schemas":                     []interface{}{},
 		},
 	}

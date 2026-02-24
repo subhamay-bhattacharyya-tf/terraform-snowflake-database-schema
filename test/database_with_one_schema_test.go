@@ -1,4 +1,4 @@
-// File: test/database_with_schema_test.go
+// File: test/database_with_one_schema_test.go
 package test
 
 import (
@@ -31,11 +31,13 @@ func TestDatabaseWithSchema(t *testing.T) {
 		"app": map[string]interface{}{
 			"name":    dbName,
 			"comment": "Terratest database with schema test",
+			"grants":  map[string]interface{}{},
 			"schemas": []interface{}{
 				map[string]interface{}{
 					"name":       schemaName,
 					"comment":    "Terratest schema",
 					"is_managed": true,
+					"grants":     map[string]interface{}{},
 				},
 			},
 		},
