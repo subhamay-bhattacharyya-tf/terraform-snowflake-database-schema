@@ -1,15 +1,13 @@
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-## [1.2.0](https://github.com/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema/compare/v1.1.0...v1.2.0) (2026-02-18)
-
-### Features
-
-* add database and schema grants support ([f9dc441](https://github.com/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema/commit/f9dc4411f13f2699d12fc8f49ecc33a0021dac9a))
-* **outputs:** add debug outputs for database and schema usage grants ([7702a8e](https://github.com/subhamay-bhattacharyya-tf/terraform-snowflake-database-schema/commit/7702a8eecf7669132df8e331d60808bc0dda33cb))
-
 ## [unreleased]
+
+### 🚀 Features
+
+- Add CREATE VIEW and CREATE MATERIALIZED VIEW schema grants
+
+### 🎨 Styling
+
+- *(variables)* Align database_configs grants object indentation
+## [1.2.0] - 2026-02-18
 
 ### 🚀 Features
 
@@ -20,6 +18,7 @@ All notable changes to this project will be documented in this file.
 
 - Update CHANGELOG.md [skip ci]
 - Update CHANGELOG.md [skip ci]
+- Update CHANGELOG.md [skip ci]
 
 ### 🎨 Styling
 
@@ -28,6 +27,7 @@ All notable changes to this project will be documented in this file.
 ### ⚙️ Miscellaneous Tasks
 
 - *(outputs)* Remove debug outputs for database and schema usage grants
+- *(release)* Version 1.2.0 [skip ci]
 ## [1.1.0] - 2026-02-12
 
 ### 🚀 Features
